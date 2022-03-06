@@ -14,7 +14,7 @@ app.use(passport.session())
 
 app.use(
 	cors({
-		origin: ['http://localhost:3000', 'https://velzon-dashboard.netlify.app'],
+		origin: 'http://localhost:3000',
 		credentials: true,
 	})
 )
