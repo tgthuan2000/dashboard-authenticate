@@ -1,6 +1,8 @@
+import dotenv from 'dotenv'
+dotenv.config()
 import sanityClient from '@sanity/client'
 
-export const client = sanityClient({
+export const sanity = sanityClient({
 	projectId: process.env.PROJECT_ID,
 	dataset: 'production',
 	apiVersion: 'v1',
