@@ -28,6 +28,7 @@ app.use(
 		origin: ['http://localhost:3000', 'https://velzon-dashboard.netlify.app'],
 		methods: 'GET,POST,PUT',
 		credentials: true,
+		allowedHeaders: ['Content-Type'],
 	})
 )
 
