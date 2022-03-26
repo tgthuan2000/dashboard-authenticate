@@ -7,6 +7,13 @@ import './passport.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
+app.use(
+	cors({
+		origin: ['http://localhost:3000', 'https://velzon-dashboard.netlify.app'],
+		methods: 'GET,POST,PUT',
+		credentials: true,
+	})
+)
 const app = express()
 
 app.use(express.json())
@@ -22,14 +29,6 @@ app.use(
 app.use(passport.initialize())
 
 app.use(passport.session())
-
-app.use(
-	cors({
-		origin: '*',
-		methods: 'GET,POST,PUT',
-		credentials: true,
-	})
-)
 
 app.use('/auth', authRoute)
 
