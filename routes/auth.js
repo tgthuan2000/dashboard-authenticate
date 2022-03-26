@@ -1,10 +1,18 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
-// import { client } from '../sanity-client.js'
+import cors from 'cors'
 const successRedirect = 'http://localhost:3000'
 const failureRedirect = '/auth/login'
 const router = express.Router()
+
+router.use(
+	cors({
+		origin: ['http://localhost:3000', 'https://velzon-dashboard.netlify.app'],
+		methods: 'GET,POST,PUT',
+		credentials: true,
+	})
+)
 
 // @route GET auth/login
 // @desc Login
