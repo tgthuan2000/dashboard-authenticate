@@ -1,7 +1,9 @@
 import express from 'express'
+import jwt from 'jsonwebtoken'
 import passport from 'passport'
 // import { client } from '../sanity-client.js'
-
+const successRedirect = 'http://localhost:3000'
+const failureRedirect = '/auth/login'
 const router = express.Router()
 
 // @route GET auth/login
@@ -20,7 +22,7 @@ router.get('/login', ({ user }, res) => {
 // @access Public
 router.get('/logout', (req, res) => {
 	req.logOut()
-	res.redirect('http://localhost:3000')
+	res.redirect(successRedirect)
 })
 
 // @route GET auth/google
@@ -34,8 +36,8 @@ router.get('/google', passport.authenticate('google', { scope: ['profile'] }))
 router.get(
 	'/google/callback',
 	passport.authenticate('google', {
-		successRedirect: 'http://localhost:3000',
-		failureRedirect: '/login',
+		successRedirect,
+		failureRedirect,
 	})
 )
 
@@ -53,28 +55,34 @@ router.get(
 router.get(
 	'/facebook/callback',
 	passport.authenticate('facebook', {
-		successRedirect: 'http://localhost:3000',
-		failureRedirect: '/login',
+		successRedirect,
+		failureRedirect,
 	})
 )
 
-// @route POST auth/register
-// @desc Register user
+// @route POST auth/local/login
+// @desc Authenticate with username password
 // @access Public
-// router.post('/register', (req, res) => {
-// 	const { username, password } = req
-// 	if (!username || !password) {
-// 		res.status(400).json({
-// 			success: false,
-// 			message: 'Missing username or password',
-// 		})
-// 	}
+router.post(
+	'/local/login',
+	passport.authenticate('local', { failureRedirect }),
+	({ user }, res) => {
+		if (user) {
+			const tokenAccess = jwt.sign({ _id: user._id }, process.env.SECRET_JWT, {
+				expiresIn: 24 * 60 * 60 * 1000,
+			})
+			res.json({ success: true, tokenAccess, user })
+		}
+	}
+)
 
-// 	try {
-// 		client
-// 			.fetch(`*[_type == 'user' && username == ${username}]`)
-// 			.then((data) => console.log(data))
-// 	} catch (err) {}
-// })
+// @route GET auth/local/re-login
+// @desc Authenticate with jwt
+// @access Public
+router.get('/local/re-login', passport.authenticate('jwt', { session: false }), ({ user }, res) => {
+	if (user) {
+		res.json({ success: true, user })
+	}
+})
 
 export default router

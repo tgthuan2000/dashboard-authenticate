@@ -1,12 +1,29 @@
-GET http://localhost:5000/auth
+GET http://localhost:5000/auth/login
 
 ###
-
 POST http://localhost:5000/auth/register
-Content-Type: 'application/json'
+Content-Type: application/json
 
 {
     "username": "user123",
     "password": "123"
 }
 
+###
+
+POST http://localhost:5000/auth/local/login
+Content-Type: application/json
+
+{
+    "username": "user123",
+    "password": "123"
+}
+
+###
+
+POST http://localhost:5000/auth/local/re-login
+Content-Type: application/json
+
+{
+    "jwt_payload": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJlMzA3MDA5My03NDNmLTQ4NmUtYmNiNS04YjRlYTViY2RiZWUiLCJpYXQiOjE2NDgyNzg3MTYsImV4cCI6MTczNDY3ODcxNn0.2d4iINOxSHEXHAwZZe8HAAXQ6TCz1fal51xMeC59LGw"
+}

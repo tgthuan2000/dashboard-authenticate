@@ -3,14 +3,16 @@ dotenv.config()
 import passport from 'passport'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import { Strategy as FacebookStrategy } from 'passport-facebook'
+import { Strategy as LocalStrategy } from 'passport-local'
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt'
 import { sanity } from './sanity-client.js'
 
 const verify = (accessToken, refreshToken, profile, done) => {
 	// verify login
 	const { id, displayName, photos, provider } = profile
 	const { value: photo } = photos[0]
-	console.log({ id, displayName, photo })
-	console.log({ accessToken })
+	// console.log({ id, displayName, photo })
+	// console.log({ accessToken })
 
 	sanity
 		.createIfNotExists({
@@ -26,11 +28,9 @@ const verify = (accessToken, refreshToken, profile, done) => {
 		})
 		.then((value) => {
 			done(null, { ...value, accessToken })
-			console.log('OK')
 		})
 		.catch((error) => {
 			done(error)
-			console.log('failed')
 		})
 }
 
@@ -53,6 +53,47 @@ passport.use(
 		},
 		verify
 	)
+)
+passport.use(
+	new LocalStrategy((username, password, done) => {
+		const query =
+			'*[_type == "user" && username == $username && password == $password] { _id, fullName, email, phone, address, username }'
+		const params = { username, password }
+
+		sanity
+			.fetch(query, params)
+			.then((data) => {
+				done(null, data[0])
+			})
+			.catch((error) => {
+				done(error)
+			})
+	})
+)
+
+const opts = {
+	jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+	secretOrKey: process.env.SECRET_JWT,
+}
+passport.use(
+	new JwtStrategy(opts, (jwt_payload, done) => {
+		const { _id, iat, exp } = jwt_payload
+
+		if (exp - iat > 0) {
+			const query =
+				'*[_type == "user" && _id == $_id] { _id, fullName, email, phone, address, username }'
+			const params = { _id }
+
+			sanity
+				.fetch(query, params)
+				.then((data) => {
+					done(null, data[0])
+				})
+				.catch((error) => {
+					done(error)
+				})
+		} else done(null, false)
+	})
 )
 
 passport.serializeUser((user, done) => {
