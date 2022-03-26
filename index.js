@@ -24,12 +24,13 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(
-	cors({
-		origin: ['http://localhost:3000', 'https://velzon-dashboard.netlify.app'],
-		methods: 'GET,POST,PUT',
-		credentials: true,
-		allowedHeaders: ['Content-Type'],
-	})
+	cors()
+	// 	{
+	// 	origin: ['http://localhost:3000', 'https://velzon-dashboard.netlify.app'],
+	// 	methods: 'GET,POST,PUT',
+	// 	credentials: true,
+	// 	allowedHeaders: ['Content-Type'],
+	// }
 )
 
 app.use('/auth', authRoute)
