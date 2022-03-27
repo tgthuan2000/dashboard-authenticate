@@ -9,6 +9,7 @@ export const LOGIN = `
         username
     }
 `
+
 export const RE_LOGIN = `
     *[_type == "user" && _id == $_id && references('${process.env.CUSTOMER_ROLE}')] 
     { 
@@ -19,4 +20,8 @@ export const RE_LOGIN = `
         address, 
         username 
     }
+`
+
+export const CHECK_USERNAME = `
+    *[_type == "user" && username == $username] {}
 `

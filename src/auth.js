@@ -2,6 +2,8 @@ import express from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
 import './passport.js'
+import { CHECK_USERNAME } from './query.js'
+import { sanity } from './sanity-client.js'
 
 const successRedirect = process.env.DEV_HOST
 const failureRedirect = '/auth/login'
@@ -83,6 +85,48 @@ router.post(
 router.get('/local/re-login', passport.authenticate('jwt', { session: false }), ({ user }, res) => {
 	if (user) {
 		res.json({ success: true, user })
+	}
+})
+
+// @route GET /auth/local/re-login
+// @desc Authenticate with jwt
+// @access Public
+router.post('/local/register', (req, res) => {
+	const { username, password, address, email, fullName, phone } = req.body
+
+	if (username) {
+		sanity.fetch(CHECK_USERNAME, { username }).then((data) => {
+			if (data.length > 0)
+				res.status(400).json({ success: false, message: 'Username already' })
+			else {
+				sanity
+					.create({
+						_type: 'user',
+						username,
+						password,
+						address,
+						email,
+						fullName,
+						phone,
+						role: {
+							_type: 'reference',
+							_ref: process.env.CUSTOMER_ROLE,
+						},
+					})
+					.then((user) => {
+						const tokenAccess = jwt.sign({ _id: user._id }, process.env.SECRET_JWT, {
+							expiresIn: 24 * 60 * 60 * 1000,
+						})
+						res.json({ success: true, user, tokenAccess })
+					})
+					.catch((err) => {
+						res.status(500).json({ success: false, message: 'Internal Server' })
+						console.log({ err })
+					})
+			}
+		})
+	} else {
+		res.status(401).json({ success: false, message: 'Username is required' })
 	}
 })
 
