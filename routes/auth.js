@@ -1,11 +1,13 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
-const successRedirect = 'http://localhost:3000'
+import './passport.js'
+
+const successRedirect = process.env.DEV_HOST
 const failureRedirect = '/auth/login'
 const router = express.Router()
 
-// @route GET auth/login
+// @route GET /auth/login
 // @desc Login
 // @access Public
 router.get('/login', ({ user }, res) => {
@@ -16,7 +18,7 @@ router.get('/login', ({ user }, res) => {
 	}
 })
 
-// @route GET auth/logout
+// @route GET /auth/logout
 // @desc Logout
 // @access Public
 router.get('/logout', (req, res) => {
@@ -24,12 +26,12 @@ router.get('/logout', (req, res) => {
 	res.redirect(successRedirect)
 })
 
-// @route GET auth/google
+// @route GET /auth/google
 // @desc Authenticate with Google
 // @access Public
 router.get('/google', passport.authenticate('google', { scope: ['profile'] }))
 
-// @route GET auth/google/callback
+// @route GET /auth/google/callback
 // @desc Callback of Google
 // @access Public
 router.get(
@@ -40,7 +42,7 @@ router.get(
 	})
 )
 
-// @route GET auth/facebook
+// @route GET /auth/facebook
 // @desc Authenticate with Facebook
 // @access Public
 router.get(
@@ -48,7 +50,7 @@ router.get(
 	passport.authenticate('facebook', { scope: ['user_friends', 'manage_pages'] })
 )
 
-// @route GET auth/facebook/callback
+// @route GET /auth/facebook/callback
 // @desc Callback of Facebook
 // @access Public
 router.get(
@@ -59,7 +61,7 @@ router.get(
 	})
 )
 
-// @route POST auth/local/login
+// @route POST /auth/local/login
 // @desc Authenticate with username password
 // @access Public
 router.post(
@@ -75,7 +77,7 @@ router.post(
 	}
 )
 
-// @route GET auth/local/re-login
+// @route GET /auth/local/re-login
 // @desc Authenticate with jwt
 // @access Public
 router.get('/local/re-login', passport.authenticate('jwt', { session: false }), ({ user }, res) => {

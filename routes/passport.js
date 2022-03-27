@@ -5,7 +5,8 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import { Strategy as FacebookStrategy } from 'passport-facebook'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt'
-import { sanity } from './sanity-client.js'
+import { sanity } from '../sanity-client.js'
+import { LOGIN, RE_LOGIN } from './query.js'
 
 const verify = (accessToken, refreshToken, profile, done) => {
 	// verify login
@@ -23,7 +24,7 @@ const verify = (accessToken, refreshToken, profile, done) => {
 			provider,
 			role: {
 				_type: 'reference',
-				_ref: '74f4c054-ed49-40d6-b910-a548810a4e3e',
+				_ref: process.env.CUSTOMER_ROLE,
 			},
 		})
 		.then((value) => {
@@ -56,12 +57,8 @@ passport.use(
 )
 passport.use(
 	new LocalStrategy((username, password, done) => {
-		const query =
-			'*[_type == "user" && username == $username && password == $password] { _id, fullName, email, phone, address, username }'
-		const params = { username, password }
-
 		sanity
-			.fetch(query, params)
+			.fetch(LOGIN, { username, password })
 			.then((data) => {
 				done(null, data[0])
 			})
@@ -80,12 +77,8 @@ passport.use(
 		const { _id, iat, exp } = jwt_payload
 
 		if (exp - iat > 0) {
-			const query =
-				'*[_type == "user" && _id == $_id] { _id, fullName, email, phone, address, username }'
-			const params = { _id }
-
 			sanity
-				.fetch(query, params)
+				.fetch(RE_LOGIN, { _id })
 				.then((data) => {
 					done(null, data[0])
 				})
