@@ -2,7 +2,7 @@ import express from 'express'
 import passport from 'passport'
 import cookieSession from 'cookie-session'
 import dotenv from 'dotenv'
-import router from './routes/auth.js'
+import router from './auth.js'
 import cors from 'cors'
 dotenv.config()
 

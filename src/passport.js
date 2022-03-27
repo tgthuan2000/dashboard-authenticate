@@ -1,11 +1,9 @@
-import dotenv from 'dotenv'
-dotenv.config()
 import passport from 'passport'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import { Strategy as FacebookStrategy } from 'passport-facebook'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt'
-import { sanity } from '../sanity-client.js'
+import { sanity } from './sanity-client.js'
 import { LOGIN, RE_LOGIN } from './query.js'
 
 const verify = (accessToken, refreshToken, profile, done) => {
