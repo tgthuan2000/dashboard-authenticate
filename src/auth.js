@@ -88,7 +88,7 @@ router.get('/local/re-login', passport.authenticate('jwt', { session: false }), 
 	}
 })
 
-// @route GET /auth/local/re-login
+// @route GET /auth/local/register
 // @desc Authenticate with jwt
 // @access Public
 router.post('/local/register', (req, res) => {
